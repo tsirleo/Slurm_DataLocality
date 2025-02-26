@@ -7,6 +7,7 @@
 .*.swo
 .deps
 .libs
+*.idea
 __pycache__
 Makefile
 autom4te.cache
@@ -24,6 +25,7 @@ autom4te.cache
 /contribs/perlapi/libslurmdb/perl/Makefile.PL
 /cscope.files
 /cscope.out
+/build/*
 /doc/html/*.html
 !/doc/html/review_release.html
 /etc/cgroup.release_common.example
