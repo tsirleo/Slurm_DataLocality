@@ -73,6 +73,7 @@ enum {
 	LONG_OPT_ACCEL_BIND,
 	LONG_OPT_ACCTG_FREQ,
 	LONG_OPT_ALLOC_NODELIST,
+	LONG_OPT_ALLUXIO_DATASOURCE,
 	LONG_OPT_ARGV,
 	LONG_OPT_BATCH,
 	LONG_OPT_BCAST,
@@ -339,6 +340,7 @@ typedef struct {
 					 * when -m plane=<# of lllp per
 					 * plane> */
 	char *job_name;			/* --job-name			*/
+	char *job_data_source;	/* --alluxio-datasource		*/
 	char *dependency;		/* --dependency			*/
 	int nice;			/* --nice			*/
 	uint32_t priority;		/* --priority			*/

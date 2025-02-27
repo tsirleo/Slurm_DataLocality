@@ -3939,6 +3939,7 @@ extern void slurmdb_pack_job_rec(void *object, uint16_t protocol_version,
 		packstr(job->account, buffer);
 		packstr(job->admin_comment, buffer);
 		pack32(job->alloc_nodes, buffer);
+		packstr(job->alluxio_datasource, buffer);
 		pack32(job->array_job_id, buffer);
 		pack32(job->array_max_tasks, buffer);
 		pack32(job->array_task_id, buffer);
@@ -4024,6 +4025,7 @@ extern void slurmdb_pack_job_rec(void *object, uint16_t protocol_version,
 		packstr(job->account, buffer);
 		packstr(job->admin_comment, buffer);
 		pack32(job->alloc_nodes, buffer);
+		packstr(job->alluxio_datasource, buffer);
 		pack32(job->array_job_id, buffer);
 		pack32(job->array_max_tasks, buffer);
 		pack32(job->array_task_id, buffer);
@@ -4106,6 +4108,7 @@ extern void slurmdb_pack_job_rec(void *object, uint16_t protocol_version,
 		packstr(job->account, buffer);
 		packstr(job->admin_comment, buffer);
 		pack32(job->alloc_nodes, buffer);
+		packstr(job->alluxio_datasource, buffer);
 		pack32(job->array_job_id, buffer);
 		pack32(job->array_max_tasks, buffer);
 		pack32(job->array_task_id, buffer);
@@ -4210,6 +4213,7 @@ extern int slurmdb_unpack_job_rec(void **job, uint16_t protocol_version,
 		safe_unpackstr_xmalloc(&job_ptr->admin_comment, &uint32_tmp,
 				       buffer);
 		safe_unpack32(&job_ptr->alloc_nodes, buffer);
+		safe_unpackstr_xmalloc(&job_ptr->alluxio_datasource, &uint32_tmp, buffer);
 		safe_unpack32(&job_ptr->array_job_id, buffer);
 		safe_unpack32(&job_ptr->array_max_tasks, buffer);
 		safe_unpack32(&job_ptr->array_task_id, buffer);
@@ -4308,6 +4312,7 @@ extern int slurmdb_unpack_job_rec(void **job, uint16_t protocol_version,
 		safe_unpackstr_xmalloc(&job_ptr->admin_comment, &uint32_tmp,
 				       buffer);
 		safe_unpack32(&job_ptr->alloc_nodes, buffer);
+		safe_unpackstr_xmalloc(&job_ptr->alluxio_datasource, &uint32_tmp, buffer);
 		safe_unpack32(&job_ptr->array_job_id, buffer);
 		safe_unpack32(&job_ptr->array_max_tasks, buffer);
 		safe_unpack32(&job_ptr->array_task_id, buffer);
@@ -4404,6 +4409,7 @@ extern int slurmdb_unpack_job_rec(void **job, uint16_t protocol_version,
 		safe_unpackstr_xmalloc(&job_ptr->admin_comment, &uint32_tmp,
 				       buffer);
 		safe_unpack32(&job_ptr->alloc_nodes, buffer);
+		safe_unpackstr_xmalloc(&job_ptr->alluxio_datasource, &uint32_tmp, buffer);
 		safe_unpack32(&job_ptr->array_job_id, buffer);
 		safe_unpack32(&job_ptr->array_max_tasks, buffer);
 		safe_unpack32(&job_ptr->array_task_id, buffer);

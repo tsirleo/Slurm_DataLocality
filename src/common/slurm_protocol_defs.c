@@ -1301,6 +1301,7 @@ extern void slurm_free_job_desc_msg(job_desc_msg_t *msg)
 		xfree(msg->acctg_freq);
 		xfree(msg->admin_comment);
 		xfree(msg->alloc_node);
+		xfree(msg->alluxio_datasource);
 		if (msg->argv) {
 			for (i = 0; i < msg->argc; i++)
 				xfree(msg->argv[i]);
@@ -1491,6 +1492,7 @@ extern void slurm_free_job_info_members(job_info_t * job)
 		xfree(job->account);
 		xfree(job->admin_comment);
 		xfree(job->alloc_node);
+		xfree(job->alluxio_datasource);
 		FREE_NULL_BITMAP(job->array_bitmap);
 		xfree(job->array_task_str);
 		xfree(job->batch_features);

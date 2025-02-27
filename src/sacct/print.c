@@ -449,6 +449,18 @@ extern void print_fields(type_t type, void *object)
 					     tmp_char,
 					     (curr_inx == field_count));
 			break;
+		case PRINT_ALLUXIO_DATASOURCE:
+			switch(type) {
+			case JOB:
+				tmp_char = job->alluxio_datasource;
+				break;
+			default:
+				break;
+			}
+			field->print_routine(field,
+					     tmp_char,
+					     (curr_inx == field_count));
+			break;
 		case PRINT_ASSOCID:
 			switch(type) {
 			case JOB:
