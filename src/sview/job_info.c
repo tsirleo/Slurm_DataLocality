@@ -108,6 +108,7 @@ enum {
 	SORTID_ACTION,
 	SORTID_ALLOC,
 	SORTID_ALLOC_NODE,
+	SORTID_ALLUXIO_DATASOURCE,
 	SORTID_ARRAY_JOB_ID,
 	SORTID_ARRAY_TASK_ID,
 	SORTID_BATCH,
@@ -383,6 +384,8 @@ static display_data_t display_data_job[] = {
 	{G_TYPE_STRING, SORTID_COMMAND, "Command",
 	 false, EDIT_NONE, refresh_job, create_model_job, admin_edit_job},
 	{G_TYPE_STRING, SORTID_COMMENT, "Comment",
+	 false, EDIT_TEXTBOX, refresh_job, create_model_job, admin_edit_job},
+	{G_TYPE_STRING, SORTID_ALLUXIO_DATASOURCE, "AlluxioDatasource",
 	 false, EDIT_TEXTBOX, refresh_job, create_model_job, admin_edit_job},
 	{G_TYPE_STRING, SORTID_EXTRA, "Extra",
 	 false, EDIT_TEXTBOX, refresh_job, create_model_job, admin_edit_job},
@@ -727,6 +730,10 @@ static const char *_set_job_msg(job_desc_msg_t *job_msg, const char *new_text,
 			got_edit_signal = NULL;
 		else
 			got_edit_signal = xstrdup(new_text);
+		break;
+	case SORTID_ALLUXIO_DATASOURCE:
+		job_msg->alluxio_datasource = xstrdup(new_text);
+		type = "alluxio_datasource";
 		break;
 	case SORTID_COMMENT:
 		job_msg->comment = xstrdup(new_text);
@@ -1263,6 +1270,11 @@ static void _layout_job_record(GtkTreeView *treeview,
 				   find_col_name(display_data_job,
 						 SORTID_ALLOC_NODE),
 				   tmp_char);
+
+	add_display_treestore_line(update, treestore, &iter,
+		   find_col_name(display_data_job,
+				 SORTID_ALLUXIO_DATASOURCE),
+		   job_ptr->alluxio_datasource);
 
 	if (job_ptr->array_task_str ||
 	    (job_ptr->array_task_id != NO_VAL)) {
@@ -2240,6 +2252,7 @@ static void _update_job_record(sview_job_info_t *sview_job_info_ptr,
 				   SORTID_ACCOUNT,      job_ptr->account,
 				   SORTID_ALLOC,        1,
 				   SORTID_ALLOC_NODE,   tmp_alloc_node,
+				   SORTID_ALLUXIO_DATASOURCE,   job_ptr->alluxio_datasource,
 				   SORTID_ARRAY_JOB_ID, tmp_array_job_id,
 				   SORTID_ARRAY_TASK_ID,tmp_array_task_id,
 				   SORTID_BATCH,        tmp_batch,
@@ -2274,6 +2287,7 @@ static void _update_job_record(sview_job_info_t *sview_job_info_ptr,
 				   SORTID_ACCOUNT,      job_ptr->account,
 				   SORTID_ALLOC,        1,
 				   SORTID_ALLOC_NODE,   tmp_alloc_node,
+				   SORTID_ALLUXIO_DATASOURCE,   job_ptr->alluxio_datasource,
 				   SORTID_ARRAY_JOB_ID, tmp_array_job_id,
 				   SORTID_ARRAY_TASK_ID,tmp_array_task_id,
 				   SORTID_BATCH,        tmp_batch,

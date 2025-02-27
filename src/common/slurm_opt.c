@@ -1456,6 +1456,17 @@ static slurm_cli_opt_t slurm_opt_environment = {
 	.reset_func = arg_reset_environment,
 };
 
+COMMON_STRING_OPTION(job_data_source);
+static slurm_cli_opt_t slurm_opt_job_data_source = {
+	.name = "alluxio-datasource",
+	.has_arg = required_argument,
+	.val = LONG_OPT_ALLUXIO_DATASOURCE,
+	.set_func = arg_set_job_data_source,
+	.set_func_data = arg_set_data_job_data_source,
+	.get_func = arg_get_job_data_source,
+	.reset_func = arg_reset_job_data_source,
+};
+
 COMMON_STRING_OPTION(dependency);
 static slurm_cli_opt_t slurm_opt_dependency = {
 	.name = "dependency",
@@ -5205,6 +5216,7 @@ static const slurm_cli_opt_t *common_options[] = {
 	&slurm_opt_debugger_test,
 	&slurm_opt_delay_boot,
 	&slurm_opt_environment,
+	&slurm_opt_job_data_source,
 	&slurm_opt_dependency,
 	&slurm_opt_disable_status,
 	&slurm_opt_distribution,
@@ -6170,6 +6182,8 @@ extern job_desc_msg_t *slurm_opt_create_job_desc(slurm_opt_t *opt_local,
 
 	job_desc->account = xstrdup(opt_local->account);
 	job_desc->acctg_freq = xstrdup(opt_local->acctg_freq);
+
+	job_desc->alluxio_datasource = xstrdup(opt_local->job_data_source);
 
 	/* admin_comment not filled in here */
 	/* alloc_node not filled in here */

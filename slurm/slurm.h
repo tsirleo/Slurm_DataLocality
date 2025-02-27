@@ -1560,6 +1560,7 @@ typedef struct job_descriptor {	/* For submit, allocate, and update requests */
 				 * slurm_allocate* function
 				 * NOTE: Also used for update flags, see
 				 * ALLOC_SID_* flags */
+	char *alluxio_datasource;	/* Alluxio datapath of job used data */
 	uint32_t argc;		/* number of arguments to the script */
 	char **argv;		/* arguments to the script */
 	char *array_inx;	/* job array index values */
@@ -1745,6 +1746,7 @@ typedef struct job_info {
 	char *admin_comment;	/* administrator's arbitrary comment */
 	char    *alloc_node;	/* local node making resource alloc */
 	uint32_t alloc_sid;	/* local sid making resource alloc */
+	char *alluxio_datasource;	/* Alluxio datapath of job used data */
 	bitstr_t *array_bitmap;	/* NOTE: set on unpack */
 	uint32_t array_job_id;	/* job_id of a job array or 0 if N/A */
 	uint32_t array_task_id;	/* task_id of a job array */
@@ -2788,6 +2790,7 @@ typedef struct reservation_name_msg {
 #define CTL_CONF_SJX            SLURM_BIT(8) /* AccountingStoreFlags=job_extra */
 #define CTL_CONF_SJS            SLURM_BIT(9) /* AccountingStoreFlags=job_script */
 #define CTL_CONF_SJE            SLURM_BIT(10) /* AccountingStoreFlags=job_env */
+#define CTL_CONF_SJAD           SLURM_BIT(11) /* AccountingStoreFlags=job_alluxio_datasource */
 
 #define LOG_FMT_ISO8601_MS      0
 #define LOG_FMT_ISO8601         1

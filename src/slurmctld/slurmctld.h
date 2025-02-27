@@ -697,6 +697,7 @@ struct job_record {
 	char    *alloc_node;		/* local node making resource alloc */
 	uint16_t alloc_resp_port;	/* RESPONSE_RESOURCE_ALLOCATION port */
 	uint32_t alloc_sid;		/* local sid making resource alloc */
+	char *alluxio_datasource;	/* Alluxio datapath of job used data */
 	uint32_t array_job_id;		/* job_id of a job array or 0 if N/A */
 	uint32_t array_task_id;		/* task_id of a job array */
 	job_array_struct_t *array_recs;	/* job array details,

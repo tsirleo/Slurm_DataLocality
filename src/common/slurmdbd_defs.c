@@ -1069,6 +1069,7 @@ extern void slurmdbd_free_job_complete_msg(dbd_job_comp_msg_t *msg)
 {
 	if (msg) {
 		xfree(msg->admin_comment);
+		xfree(msg->alluxio_datasource);
 		xfree(msg->comment);
 		xfree(msg->extra);
 		xfree(msg->failed_node);

@@ -104,6 +104,7 @@ typedef struct {
 	char *account;
 	char *admin_comment;
 	char *alloc_nodes;
+	char *alluxio_datasource;
 	char *associd;
 	char *array_jobid;
 	char *array_max_tasks;
@@ -178,6 +179,7 @@ static void _free_local_job_members(local_job_t *object)
 		xfree(object->account);
 		xfree(object->admin_comment);
 		xfree(object->alloc_nodes);
+		xfree(object->alluxio_datasource);
 		xfree(object->associd);
 		xfree(object->array_jobid);
 		xfree(object->array_max_tasks);
@@ -521,6 +523,7 @@ enum {
 static char *job_req_inx[] = {
 	"account",
 	"admin_comment",
+	"alluxio_datasource",
 	"array_max_tasks",
 	"array_task_pending",
 	"array_task_str",
@@ -579,6 +582,7 @@ static char *job_req_inx[] = {
 enum {
 	JOB_REQ_ACCOUNT,
 	JOB_REQ_ADMIN_COMMENT,
+	JOB_REQ_ALLUXIO_DATASOURCE,
 	JOB_REQ_ARRAY_MAX,
 	JOB_REQ_ARRAY_TASK_PENDING,
 	JOB_REQ_ARRAY_TASK_STR,
@@ -965,6 +969,7 @@ static void _pack_local_job(local_job_t *object, uint16_t rpc_version,
 	packstr(object->account, buffer);
 	packstr(object->admin_comment, buffer);
 	packstr(object->alloc_nodes, buffer);
+	packstr(object->alluxio_datasource, buffer);
 	packstr(object->associd, buffer);
 	packstr(object->array_jobid, buffer);
 	packstr(object->array_max_tasks, buffer);
@@ -1052,6 +1057,7 @@ static int _unpack_local_job(local_job_t *object, uint16_t rpc_version,
 		safe_unpackstr_xmalloc(&object->account, &tmp32, buffer);
 		safe_unpackstr_xmalloc(&object->admin_comment, &tmp32, buffer);
 		safe_unpackstr_xmalloc(&object->alloc_nodes, &tmp32, buffer);
+		safe_unpackstr_xmalloc(&object->alluxio_datasource, &tmp32, buffer);
 		safe_unpackstr_xmalloc(&object->associd, &tmp32, buffer);
 		safe_unpackstr_xmalloc(&object->array_jobid, &tmp32, buffer);
 		safe_unpackstr_xmalloc(&object->array_max_tasks,
@@ -3478,6 +3484,7 @@ static buf_t *_pack_archive_jobs(MYSQL_RES *result, char *cluster_name,
 		job.account = row[JOB_REQ_ACCOUNT];
 		job.admin_comment = row[JOB_REQ_ADMIN_COMMENT];
 		job.alloc_nodes = row[JOB_REQ_ALLOC_NODES];
+		job.alluxio_datasource = row[JOB_REQ_ALLUXIO_DATASOURCE];
 		job.associd = row[JOB_REQ_ASSOCID];
 		job.array_jobid = row[JOB_REQ_ARRAYJOBID];
 		job.array_max_tasks = row[JOB_REQ_ARRAY_MAX];
@@ -3590,6 +3597,7 @@ static char *_load_jobs(uint16_t rpc_version, buf_t *buffer,
 	int null_attributes[] = {
 		JOB_REQ_ACCOUNT,
 		JOB_REQ_ADMIN_COMMENT,
+		JOB_REQ_ALLUXIO_DATASOURCE,
 		JOB_REQ_ARRAY_TASK_STR,
 		JOB_REQ_BLOCKID,
 		JOB_REQ_CONSTRAINTS,
@@ -3642,6 +3650,10 @@ static char *_load_jobs(uint16_t rpc_version, buf_t *buffer,
 		else
 			xstrcatat(format, &format_pos, ", '%s'");
 		if (object.admin_comment == NULL)
+			xstrcatat(format, &format_pos, ", %s");
+		else
+			xstrcatat(format, &format_pos, ", '%s'");
+		if (object.alluxio_datasource == NULL)
 			xstrcatat(format, &format_pos, ", %s");
 		else
 			xstrcatat(format, &format_pos, ", '%s'");
@@ -3745,6 +3757,8 @@ static char *_load_jobs(uint16_t rpc_version, buf_t *buffer,
 				"NULL" : object.account,
 			     (object.admin_comment == NULL) ?
 				"NULL" : object.admin_comment,
+			     (object.alluxio_datasource == NULL) ?
+				"NULL" : object.alluxio_datasource,
 			     (object.array_task_str == NULL) ?
 				"NULL" : object.array_task_str,
 			     (object.blockid == NULL) ?

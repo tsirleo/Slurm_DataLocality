@@ -55,6 +55,7 @@ typedef struct {
 char *job_req_inx[] = {
 	"t1.account",
 	"t1.admin_comment",
+	"t1.alluxio_datasource",
 	"t1.array_max_tasks",
 	"t1.array_task_str",
 	"t1.constraints",
@@ -115,6 +116,7 @@ char *job_req_inx[] = {
 enum {
 	JOB_REQ_ACCOUNT1,
 	JOB_REQ_ADMIN_COMMENT,
+	JOB_REQ_ALLUXIO_DATASOURCE,
 	JOB_REQ_ARRAY_MAX,
 	JOB_REQ_ARRAY_STR,
 	JOB_REQ_CONSTRAINTS,
@@ -856,6 +858,7 @@ static int _cluster_get_jobs(mysql_conn_t *mysql_conn,
 		job->constraints = xstrdup(row[JOB_REQ_CONSTRAINTS]);
 		job->container = xstrdup(row[JOB_REQ_CONTAINER]);
 		job->extra = xstrdup(row[JOB_REQ_EXTRA]);
+		job->alluxio_datasource = xstrdup(row[JOB_REQ_ALLUXIO_DATASOURCE]);
 		job->licenses = xstrdup(row[JOB_REQ_LICENSES]);
 		job->flags = slurm_atoul(row[JOB_REQ_FLAGS]);
 

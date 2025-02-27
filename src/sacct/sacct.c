@@ -49,6 +49,7 @@ print_field_t fields[] = {
 	{10, "AllocCPUS", print_fields_uint, PRINT_ALLOC_CPUS},
 	{10, "AllocNodes", print_fields_str, PRINT_ALLOC_NODES},
 	{10, "AllocTRES", print_fields_str, PRINT_TRESA},
+	{19, "AlluxioDatasource", print_fields_str, PRINT_ALLUXIO_DATASOURCE},
 	{7,  "AssocID", print_fields_uint, PRINT_ASSOCID},
 	{10, "AveCPU", print_fields_str, PRINT_AVECPU},
 	{10, "AveCPUFreq", print_fields_str, PRINT_ACT_CPUFREQ},

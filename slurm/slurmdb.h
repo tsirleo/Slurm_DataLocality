@@ -795,6 +795,7 @@ typedef struct {
 typedef struct {
 	char    *account;
 	char	*admin_comment;
+	char	*alluxio_datasource;
 	uint32_t alloc_nodes;
 	uint32_t array_job_id;	/* job_id of a job array or 0 if N/A */
 	uint32_t array_max_tasks; /* How many tasks of the array can be

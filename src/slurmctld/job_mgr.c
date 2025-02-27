@@ -1518,6 +1518,7 @@ static int _dump_job_state(void *object, void *arg)
 	packstr(dump_job_ptr->alloc_node, buffer);
 	packstr(dump_job_ptr->account, buffer);
 	packstr(dump_job_ptr->admin_comment, buffer);
+	packstr(dump_job_ptr->alluxio_datasource, buffer);
 	packstr(dump_job_ptr->comment, buffer);
 	packstr(dump_job_ptr->extra, buffer);
 	packstr(dump_job_ptr->gres_used, buffer);
@@ -1793,6 +1794,7 @@ static int _load_job_state(buf_t *buffer, uint16_t protocol_version)
 		safe_unpackstr_xmalloc(&wckey, &name_len, buffer);
 		safe_unpackstr_xmalloc(&alloc_node, &name_len, buffer);
 		safe_unpackstr_xmalloc(&account, &name_len, buffer);
+		safe_unpackstr_xmalloc(&job_ptr->alluxio_datasource, &name_len, buffer);
 		safe_unpackstr_xmalloc(&admin_comment, &name_len, buffer);
 		safe_unpackstr_xmalloc(&comment, &name_len, buffer);
 		safe_unpackstr_xmalloc(&job_ptr->extra, &name_len, buffer);
@@ -4571,6 +4573,8 @@ void dump_job_desc(job_desc_msg_t *job_desc)
 	debug3("   power_flags=%s",
 	       power_flags_str(job_desc->power_flags));
 
+	debug3("   alluxio_datasource=%s", job_desc->alluxio_datasource);
+
 	debug3("   resp_host=%s alloc_resp_port=%u other_port=%u",
 	       job_desc->resp_host,
 	       job_desc->alloc_resp_port, job_desc->other_port);
@@ -4757,6 +4761,8 @@ extern job_record_t *job_array_split(job_record_t *job_ptr)
 	job_ptr_pend->admin_comment = xstrdup(job_ptr->admin_comment);
 	job_ptr_pend->alias_list = xstrdup(job_ptr->alias_list);
 	job_ptr_pend->alloc_node = xstrdup(job_ptr->alloc_node);
+
+	job_ptr_pend->alluxio_datasource = xstrdup(job_ptr->alluxio_datasource);
 
 	job_ptr_pend->array_recs = job_ptr->array_recs;
 	job_ptr->array_recs = NULL;
@@ -8066,6 +8072,7 @@ static int _test_job_desc_fields(job_desc_msg_t * job_desc)
 	    _test_strlen(job_desc->cpus_per_tres, "cpus_per_tres", 1024)||
 	    _test_strlen(job_desc->dependency, "dependency", 1024*128)	||
 	    _test_strlen(job_desc->extra, "extra", 1024)		||
+	    _test_strlen(job_desc->alluxio_datasource, "alluxio_datasource", 1024)		||
 	    _test_strlen(job_desc->features, "features", 1024)		||
 	    _test_strlen(
 		    job_desc->cluster_features, "cluster_features", 1024)   ||
@@ -8829,6 +8836,7 @@ static int _copy_job_desc_to_job_record(job_desc_msg_t *job_desc,
 	job_ptr->restart_cnt = job_desc->restart_cnt;
 	job_ptr->comment    = xstrdup(job_desc->comment);
 	job_ptr->extra = xstrdup(job_desc->extra);
+	job_ptr->alluxio_datasource = xstrdup(job_desc->alluxio_datasource);
 	job_ptr->container = xstrdup(job_desc->container);
 	job_ptr->container_id = xstrdup(job_desc->container_id);
 	job_ptr->admin_comment = xstrdup(job_desc->admin_comment);
@@ -10187,6 +10195,7 @@ static void _list_delete_job(void *job_entry)
 	xfree(job_ptr->admin_comment);
 	xfree(job_ptr->alias_list);
 	xfree(job_ptr->alloc_node);
+	xfree(job_ptr->alluxio_datasource);
 	free_null_array_recs(job_ptr);
 	if (job_ptr->array_recs) {
 		FREE_NULL_BITMAP(job_ptr->array_recs->task_id_bitmap);
@@ -10908,6 +10917,7 @@ void pack_job(job_record_t *dump_job_ptr, uint16_t show_flags, buf_t *buffer,
 		packstr(dump_job_ptr->network, buffer);
 		packstr(dump_job_ptr->comment, buffer);
 		packstr(dump_job_ptr->extra, buffer);
+		packstr(dump_job_ptr->alluxio_datasource, buffer);
 		packstr(dump_job_ptr->container, buffer);
 		packstr(dump_job_ptr->batch_features, buffer);
 		packstr(dump_job_ptr->batch_host, buffer);
@@ -13329,6 +13339,13 @@ static int _update_job(job_record_t *job_ptr, job_desc_msg_t *job_desc,
 		job_ptr->extra = xstrdup(job_desc->extra);
 		info("%s: setting extra to %s for %pJ",
 		     __func__, job_ptr->extra, job_ptr);
+	}
+
+	if (job_desc->alluxio_datasource) {
+		xfree(job_ptr->alluxio_datasource);
+		job_ptr->alluxio_datasource = xstrdup(job_desc->alluxio_datasource);
+		info("%s: setting alluxio_datasource to %s for %pJ",
+			 __func__, job_ptr->alluxio_datasource, job_ptr);
 	}
 
 	if (error_code != SLURM_SUCCESS)
@@ -18621,6 +18638,7 @@ extern job_desc_msg_t *copy_job_record_to_job_desc(job_record_t *job_ptr)
 	job_desc->account           = xstrdup(job_ptr->account);
 	job_desc->acctg_freq        = xstrdup(details->acctg_freq);
 	job_desc->alloc_node        = xstrdup(job_ptr->alloc_node);
+	job_desc->alluxio_datasource = xstrdup(job_ptr->alluxio_datasource);
 	/* Since the allocating salloc or srun is not expected to exist
 	 * when this checkpointed job is restarted, do not save these:
 	 *
@@ -19596,6 +19614,9 @@ extern char **job_common_env_vars(job_record_t *job_ptr, bool is_complete)
 			}
 		}
 	}
+
+	if (job_ptr->alluxio_datasource)
+		setenvf(&my_env, "SLURM_JOB_ALLUXIO_DATASOURCE", "%s", job_ptr->alluxio_datasource);
 
 	if (slurm_conf.cluster_name) {
 		setenvf(&my_env, "SLURM_CLUSTER_NAME", "%s",

@@ -288,6 +288,7 @@ static slurm_opt_t *_opt_copy(void)
 	opt_dup->exclude = xstrdup(opt.exclude);
 	opt_dup->export_env = xstrdup(opt.export_env);
 	opt_dup->extra = xstrdup(opt.extra);
+	opt_dup->job_data_source = xstrdup(opt.job_data_source);
 	opt.gres = NULL;		/* Moved by memcpy */
 	opt.gpu_bind = NULL;		/* Moved by memcpy */
 	opt.gpu_freq = NULL;		/* Moved by memcpy */
@@ -1510,6 +1511,7 @@ static void _usage(void)
 "            [--ntasks-per-core=n] [--mem-per-cpu=MB] [--preserve-env]\n"
 "            [--profile=...] [--exact]\n"
 "            [--mail-type=type] [--mail-user=user] [--nice[=value]]\n"
+"            [--alluxio-datasource=datapath]\n"
 "            [--prolog=fname] [--epilog=fname]\n"
 "            [--task-prolog=fname] [--task-epilog=fname]\n"
 "            [--ctrl-comm-ifhn=addr] [--multi-prog] [--mcs-label=mcs]\n"
@@ -1553,6 +1555,8 @@ static void _help(void)
 "      --container             Path to OCI container bundle\n"
 "      --container-id          OCI container ID\n"
 "      --cpu-freq=min[-max[:gov]] requested cpu frequency (and governor)\n"
+"      --alluxio-datasource=datapath  S3 bucket name or path of directory in the bucket "
+"                              started from its name and alluxio mountpoint path\n"
 "  -d, --dependency=type:jobid[:time] defer job until condition on jobid is satisfied\n"
 "      --deadline=time         remove the job if no ending possible before\n"
 "                              this deadline (start > (deadline - time[-min]))\n"

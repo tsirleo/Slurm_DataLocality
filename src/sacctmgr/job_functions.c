@@ -201,6 +201,12 @@ static int _set_rec(int *start, int argc, char **argv,
 			job->admin_comment =
 				strip_quotes(argv[i] + end, NULL, false);
 			set = 1;
+		} else if (!xstrncasecmp(argv[i], "AlluxioDatasource",
+					 MAX(command_len, 17))) {
+			xfree(job->alluxio_datasource);
+			job->alluxio_datasource =
+				strip_quotes(argv[i] + end, NULL, false);
+			set = 1;
 		} else if (!xstrncasecmp(argv[i], "SystemComment",
 					 MAX(command_len, 13))) {
 			xfree(job->system_comment);

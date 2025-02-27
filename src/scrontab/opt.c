@@ -51,6 +51,7 @@ extern void fill_job_desc_from_opts(job_desc_msg_t *desc)
 
 	desc->req_nodes = xstrdup(opt.nodelist);
 	desc->extra = xstrdup(opt.extra);
+	desc->alluxio_datasource = xstrdup(opt.job_data_source);
 	desc->exc_nodes = xstrdup(opt.exclude);
 	desc->partition = xstrdup(opt.partition);
 	desc->profile = opt.profile;

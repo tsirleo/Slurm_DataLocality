@@ -305,6 +305,7 @@ static const parser_t parse_job[] = {
 	_add_parse(STRING, account, "account"),
 	_add_parse(STRING, admin_comment, "comment/administrator"),
 	_add_parse(UINT32, alloc_nodes, "allocation_nodes"),
+	_add_parse(STRING, alluxio_datasource, "alluxio_datasource"),
 	_add_parse(UINT32, array_job_id, "array/job_id"),
 	_add_parse(UINT32, array_max_tasks, "array/limits/max/running/tasks"),
 	_add_parse(STRING, array_task_str, "array/task"),
