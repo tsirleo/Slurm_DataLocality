@@ -3798,11 +3798,12 @@ _unpack_job_info_members(job_info_t * job, buf_t *buffer,
 		safe_unpackstr(&job->sched_nodes, buffer);
 		safe_unpackstr(&job->partition, buffer);
 		safe_unpackstr(&job->account, buffer);
-		safe_unpackstr(&job->admin_comment,buffer);
+		safe_unpackstr(&job->admin_comment, buffer);
 		safe_unpack32(&job->site_factor, buffer);
 		safe_unpackstr(&job->network, buffer);
 		safe_unpackstr(&job->comment, buffer);
 		safe_unpackstr(&job->extra, buffer);
+		safe_unpackstr(&job->alluxio_datasource, buffer);
 		safe_unpackstr(&job->container, buffer);
 		safe_unpackstr(&job->batch_features, buffer);
 		safe_unpackstr(&job->batch_host, buffer);
@@ -3977,7 +3978,7 @@ _unpack_job_info_members(job_info_t * job, buf_t *buffer,
 		safe_unpackstr_xmalloc(&job->sched_nodes, &uint32_tmp, buffer);
 		safe_unpackstr_xmalloc(&job->partition, &uint32_tmp, buffer);
 		safe_unpackstr_xmalloc(&job->account, &uint32_tmp, buffer);
-		safe_unpackstr_xmalloc(&job->admin_comment, &uint32_tmp,buffer);
+		safe_unpackstr_xmalloc(&job->admin_comment, &uint32_tmp, buffer);
 		safe_unpack32(&job->site_factor, buffer);
 		safe_unpackstr_xmalloc(&job->network, &uint32_tmp, buffer);
 		safe_unpackstr_xmalloc(&job->comment, &uint32_tmp, buffer);
@@ -6812,6 +6813,7 @@ static void _pack_job_desc_msg(job_desc_msg_t *job_desc_ptr, buf_t *buffer,
 		pack64(job_desc_ptr->bitflags, buffer);
 		pack32(job_desc_ptr->delay_boot, buffer);
 		packstr(job_desc_ptr->extra, buffer);
+		packstr(job_desc_ptr->alluxio_datasource, buffer);
 		pack16(job_desc_ptr->x11, buffer);
 		packstr(job_desc_ptr->x11_magic_cookie, buffer);
 		packstr(job_desc_ptr->x11_target, buffer);
@@ -6948,6 +6950,7 @@ static void _pack_job_desc_msg(job_desc_msg_t *job_desc_ptr, buf_t *buffer,
 		pack64(job_desc_ptr->bitflags, buffer);
 		pack32(job_desc_ptr->delay_boot, buffer);
 		packstr(job_desc_ptr->extra, buffer);
+		packstr(job_desc_ptr->alluxio_datasource, buffer);
 		pack16(job_desc_ptr->x11, buffer);
 		packstr(job_desc_ptr->x11_magic_cookie, buffer);
 		packstr(job_desc_ptr->x11_target, buffer);
@@ -7083,6 +7086,7 @@ static void _pack_job_desc_msg(job_desc_msg_t *job_desc_ptr, buf_t *buffer,
 		pack64(job_desc_ptr->bitflags, buffer);
 		pack32(job_desc_ptr->delay_boot, buffer);
 		packstr(job_desc_ptr->extra, buffer);
+		packstr(job_desc_ptr->alluxio_datasource, buffer);
 		pack16(job_desc_ptr->x11, buffer);
 		packstr(job_desc_ptr->x11_magic_cookie, buffer);
 		packstr(job_desc_ptr->x11_target, buffer);
@@ -7265,6 +7269,7 @@ _unpack_job_desc_msg(job_desc_msg_t ** job_desc_buffer_ptr, buf_t *buffer,
 		safe_unpack64(&job_desc_ptr->bitflags, buffer);
 		safe_unpack32(&job_desc_ptr->delay_boot, buffer);
 		safe_unpackstr(&job_desc_ptr->extra, buffer);
+		safe_unpackstr(&job_desc_ptr->alluxio_datasource, buffer);
 		safe_unpack16(&job_desc_ptr->x11, buffer);
 		safe_unpackstr(&job_desc_ptr->x11_magic_cookie, buffer);
 		safe_unpackstr(&job_desc_ptr->x11_target, buffer);
@@ -7471,6 +7476,8 @@ _unpack_job_desc_msg(job_desc_msg_t ** job_desc_buffer_ptr, buf_t *buffer,
 		safe_unpack32(&job_desc_ptr->delay_boot, buffer);
 		safe_unpackstr_xmalloc(&job_desc_ptr->extra, &uint32_tmp,
 				       buffer);
+		safe_unpackstr_xmalloc(&job_desc_ptr->alluxio_datasource,
+		               &uint32_tmp, buffer);
 		safe_unpack16(&job_desc_ptr->x11, buffer);
 		safe_unpackstr_xmalloc(&job_desc_ptr->x11_magic_cookie,
 				       &uint32_tmp, buffer);
@@ -7686,6 +7693,8 @@ _unpack_job_desc_msg(job_desc_msg_t ** job_desc_buffer_ptr, buf_t *buffer,
 		safe_unpack32(&job_desc_ptr->delay_boot, buffer);
 		safe_unpackstr_xmalloc(&job_desc_ptr->extra, &uint32_tmp,
 				       buffer);
+		safe_unpackstr_xmalloc(&job_desc_ptr->alluxio_datasource,
+			           &uint32_tmp, buffer);
 		safe_unpack16(&job_desc_ptr->x11, buffer);
 		safe_unpackstr_xmalloc(&job_desc_ptr->x11_magic_cookie,
 				       &uint32_tmp, buffer);

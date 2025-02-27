@@ -1129,6 +1129,7 @@ static void _usage(void)
 "              [--contiguous] [--mincpus=n] [--mem=MB] [--tmp=MB] [-C list]\n"
 "              [--account=name] [--dependency=type:jobid[+time]] [--comment=name]\n"
 "              [--mail-type=type] [--mail-user=user] [--nice[=value]] [--wait]\n"
+"              [--alluxio-datasource=datapath]\n"
 "              [--requeue] [--no-requeue] [--ntasks-per-node=n] [--propagate]\n"
 "              [--nodefile=file] [--nodelist=hosts] [--exclude=hosts]\n"
 "              [--network=type] [--mem-per-cpu=MB] [--qos=qos] [--gres=list]\n"
@@ -1232,6 +1233,10 @@ static void _help(void)
 "      --wckey=wckey           wckey to run job under\n"
 "      --wrap[=command string] wrap command string in a sh script and submit\n"
 
+"\n"
+"Alluxio options:\n"
+"      --alluxio-datasource=datapath  S3 bucket name or path of directory in the bucket "
+"                              started from its name and alluxio mountpoint path\n"
 "\n"
 "Constraint options:\n"
 "      --cluster-constraint=[!]list specify a list of cluster constraints\n"

@@ -2951,6 +2951,8 @@ extern int jobacct_storage_p_job_complete(void *db_conn, job_record_t *job_ptr)
 
 	req.admin_comment = job_ptr->admin_comment;
 
+	req.alluxio_datasource = job_ptr->alluxio_datasource;
+
 	if (slurm_conf.conf_flags & CTL_CONF_SJC)
 		req.comment = job_ptr->comment;
 	if (slurm_conf.conf_flags & CTL_CONF_SJX)

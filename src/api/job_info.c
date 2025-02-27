@@ -963,6 +963,12 @@ slurm_sprint_job_info ( job_info_t * job_ptr, int one_liner )
 	}
 
 	/****** Line (optional) ******/
+	if (job_ptr->alluxio_datasource) {
+		xstrcat(out, line_end);
+		xstrfmtcat(out, "AlluxioDatasource=%s ", job_ptr->alluxio_datasource);
+	}
+
+	/****** Line (optional) ******/
 	if (job_ptr->system_comment) {
 		xstrcat(out, line_end);
 		xstrfmtcat(out, "SystemComment=%s ", job_ptr->system_comment);

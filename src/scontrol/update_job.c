@@ -676,6 +676,10 @@ extern int scontrol_update_job(int argc, char **argv)
 			job_msg.cluster_features = val;
 			update_cnt++;
 		}
+		else if (!xstrncasecmp(tag, "AlluxioDatasource", MAX(taglen, 17))) {
+			job_msg.alluxio_datasource = val;
+			update_cnt++;
+		}
 		else if (xstrncasecmp(tag, "DelayBoot", MAX(taglen, 5)) == 0) {
 			int time_sec = time_str2secs(val);
 			if (time_sec == NO_VAL) {

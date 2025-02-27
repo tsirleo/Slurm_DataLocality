@@ -373,6 +373,7 @@ static void _pack_job_complete_msg(dbd_job_comp_msg_t *msg,
 {
 	if (rpc_version >= SLURM_23_02_PROTOCOL_VERSION) {
 		packstr(msg->admin_comment, buffer);
+		packstr(msg->alluxio_datasource, buffer);
 		pack32(msg->assoc_id, buffer);
 		packstr(msg->comment, buffer);
 		pack64(msg->db_index, buffer);
@@ -416,6 +417,7 @@ static int _unpack_job_complete_msg(dbd_job_comp_msg_t **msg,
 
 	if (rpc_version >= SLURM_23_02_PROTOCOL_VERSION) {
 		safe_unpackstr(&msg_ptr->admin_comment, buffer);
+		safe_unpackstr(&msg_ptr->alluxio_datasource, buffer);
 		safe_unpack32(&msg_ptr->assoc_id, buffer);
 		safe_unpackstr(&msg_ptr->comment, buffer);
 		safe_unpack64(&msg_ptr->db_index, buffer);

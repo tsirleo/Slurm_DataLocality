@@ -1420,6 +1420,7 @@ static int _job_complete(slurmdbd_conn_t *slurmdbd_conn, persist_msg_t *msg,
 	memset(&details, 0, sizeof(job_details_t));
 
 	job.admin_comment = job_comp_msg->admin_comment;
+	job.alluxio_datasource = job_comp_msg->alluxio_datasource;
 	job.assoc_id = job_comp_msg->assoc_id;
 	job.comment = job_comp_msg->comment;
 	if (job_comp_msg->db_index != NO_VAL64)
