@@ -2790,6 +2790,7 @@ typedef struct reservation_name_msg {
 #define CTL_CONF_SJX            SLURM_BIT(8) /* AccountingStoreFlags=job_extra */
 #define CTL_CONF_SJS            SLURM_BIT(9) /* AccountingStoreFlags=job_script */
 #define CTL_CONF_SJE            SLURM_BIT(10) /* AccountingStoreFlags=job_env */
+#define CTL_CONF_SJAD           SLURM_BIT(11) /* AccountingStoreFlags=job_alluxio_datasource */
 
 #define LOG_FMT_ISO8601_MS      0
 #define LOG_FMT_ISO8601         1

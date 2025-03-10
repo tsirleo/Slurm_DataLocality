@@ -912,6 +912,9 @@ extern List as_mysql_modify_job(mysql_conn_t *mysql_conn, uint32_t uid,
 	if (job->extra)
 		xstrfmtcat(vals, ", extra='%s'", job->extra);
 
+	if (job->alluxio_datasource)
+		xstrfmtcat(vals, ", alluxio_datasource='%s'", job->alluxio_datasource);
+
 	if (job->wckey)
 		xstrfmtcat(vals, ", wckey='%s'", job->wckey);
 
@@ -1234,6 +1237,9 @@ extern int as_mysql_job_complete(mysql_conn_t *mysql_conn,
 
 	if (job_ptr->extra)
 		xstrfmtcat(query, ", extra='%s'", job_ptr->extra);
+
+	if (job_ptr->alluxio_datasource)
+		xstrfmtcat(query, ", alluxio_datasource='%s'", job_ptr->alluxio_datasource);
 
 	if (job_ptr->failed_node)
 		xstrfmtcat(query, ", failed_node='%s'", job_ptr->failed_node);

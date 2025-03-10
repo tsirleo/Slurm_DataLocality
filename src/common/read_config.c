@@ -4630,6 +4630,8 @@ static int _validate_and_set_defaults(slurm_conf_t *conf,
 			conf->conf_flags |= CTL_CONF_SJE;
 		if (xstrcasestr(temp_str, "job_extra"))
 			conf->conf_flags |= CTL_CONF_SJX;
+		if (xstrcasestr(temp_str, "job_alluxio_datasource"))
+			conf->conf_flags |= CTL_CONF_SJAD;
 		if (xstrcasestr(temp_str, "job_script"))
 			conf->conf_flags |= CTL_CONF_SJS;
 		xfree(temp_str);
