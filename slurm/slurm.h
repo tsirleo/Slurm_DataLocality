@@ -663,7 +663,8 @@ enum select_plugin_type {
 	SELECT_PLUGIN_CRAY_LINEAR    = 107, /* Linear on a Native Cray */
 	SELECT_PLUGIN_CRAY_CONS_RES  = 108, /* Cons Res on a Native Cray */
 	SELECT_PLUGIN_CONS_TRES      = 109, /* Cons TRES on a normal system */
-	SELECT_PLUGIN_CRAY_CONS_TRES = 110  /* Cons TRES on a Native Cray */
+	SELECT_PLUGIN_CRAY_CONS_TRES = 110,  /* Cons TRES on a Native Cray */
+	SELECT_PLUGIN_CONS_TRES_LOCALITY = 111 /* Cons TRES on a normal system + alluxio data tracking */
 };
 
 /* switch plugin (id) in use by cluster */

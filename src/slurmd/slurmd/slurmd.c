@@ -957,7 +957,8 @@ _read_config(void)
 
 #ifndef HAVE_FRONT_END
 	if (!xstrcmp(cf->select_type, "select/cons_res") ||
-	    !xstrcmp(cf->select_type, "select/cons_tres"))
+	    !xstrcmp(cf->select_type, "select/cons_tres") ||
+	    !xstrcmp(cf->select_type, "select/cons_tres_locality"))
 		cr_flag = true;
 	if (!xstrcmp(cf->select_type, "select/cray_aries") &&
 	    ((cf->select_type_param & CR_OTHER_CONS_RES) ||

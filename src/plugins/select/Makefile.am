@@ -1,7 +1,7 @@
 # Makefile for node selection plugins
 
 # NOTE: other must be in the list before cray_aries lest the build break
-SUBDIRS = other cons_common cons_res cons_tres cray_aries linear
+SUBDIRS = other cons_common cons_res cons_tres cons_tres_locality cray_aries linear
 
 # Each plugin here needs a plugin_id.
 # Here are the current plugin_ids for each plugin.
@@ -17,3 +17,4 @@ SUBDIRS = other cons_common cons_res cons_tres cray_aries linear
 # cray_aries + cons_res    = 108
 # cons_tres                = 109
 # cray_aries + cons_tres   = 110
+# cons_tres_locality       = 111

@@ -84,15 +84,16 @@ list_t *cluster_license_list;
 bool     backfill_busy_nodes  = false;
 int      bf_window_scale      = 0;
 cons_common_callbacks_t cons_common_callbacks = {0};
-int      core_array_size      = 1;
-bool     gang_mode            = false;
-bool     have_dragonfly       = false;
-bool     is_cons_tres         = false;
-bool     pack_serial_at_end   = false;
-bool     preempt_by_part      = false;
-bool     preempt_by_qos       = false;
-bool     spec_cores_first     = false;
-bool     topo_optional        = false;
+int      core_array_size       = 1;
+bool     gang_mode             = false;
+bool     have_dragonfly        = false;
+bool     is_cons_tres          = false;
+bool     is_cons_tres_locality = false;
+bool     pack_serial_at_end    = false;
+bool     preempt_by_part       = false;
+bool     preempt_by_qos        = false;
+bool     spec_cores_first      = false;
+bool     topo_optional         = false;
 
 /* Global variables */
 
@@ -880,8 +881,11 @@ extern void common_init(void)
 	else
 		gang_mode = false;
 
-	if (plugin_id == SELECT_PLUGIN_CONS_TRES)
+	if (plugin_id == SELECT_PLUGIN_CONS_TRES || plugin_id == SELECT_PLUGIN_CONS_TRES_LOCALITY)
 		is_cons_tres = true;
+
+	if (plugin_id == SELECT_PLUGIN_CONS_TRES_LOCALITY)
+		is_cons_tres_locality = true;
 
 	verbose("%s loaded", plugin_type);
 

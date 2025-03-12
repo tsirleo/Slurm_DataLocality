@@ -115,6 +115,7 @@ const plugin_id_name plugin_ids[] = {
 	{ SELECT_PLUGIN_CRAY_CONS_RES, "cray_aries+cons_res" },
 	{ SELECT_PLUGIN_CONS_TRES, "cons_tres" },
 	{ SELECT_PLUGIN_CRAY_CONS_TRES, "cray_aries+cons_tres" },
+	{SELECT_PLUGIN_CONS_TRES_LOCALITY, "cons_tres_locality"},
 };
 
 extern char *select_plugin_id_to_string(int plugin_id)
