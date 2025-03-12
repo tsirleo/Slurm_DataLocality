@@ -121,7 +121,8 @@ extern int state_control_corecnt_supported(void)
 	if ((select_type != SELECT_PLUGIN_CONS_RES) &&
 	    (select_type != SELECT_PLUGIN_CONS_TRES) &&
 	    (select_type != SELECT_PLUGIN_CRAY_CONS_RES) &&
-	    (select_type != SELECT_PLUGIN_CRAY_CONS_TRES))
+	    (select_type != SELECT_PLUGIN_CRAY_CONS_TRES) &&
+	    (select_type != SELECT_PLUGIN_CONS_TRES_LOCALITY))
 		return SLURM_ERROR;
 
 	return SLURM_SUCCESS;

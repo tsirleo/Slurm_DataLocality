@@ -880,7 +880,7 @@ extern void common_init(void)
 	else
 		gang_mode = false;
 
-	if (plugin_id == SELECT_PLUGIN_CONS_TRES)
+	if (plugin_id == SELECT_PLUGIN_CONS_TRES || plugin_id == SELECT_PLUGIN_CONS_TRES_LOCALITY)
 		is_cons_tres = true;
 
 	verbose("%s loaded", plugin_type);
