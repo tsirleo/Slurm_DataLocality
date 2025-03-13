@@ -188,6 +188,7 @@ static bool     validate_cfgd_licenses = true;
 static void _add_job_hash(job_record_t *job_ptr);
 static void _add_job_array_hash(job_record_t *job_ptr);
 static void _handle_requeue_limit(job_record_t *job_ptr, const char *caller);
+static bool _check_alluxio_path_exists(const char *data_path);
 static void _clear_job_gres_details(job_record_t *job_ptr);
 static int  _copy_job_desc_to_file(job_desc_msg_t * job_desc,
 				   uint32_t job_id);
@@ -273,6 +274,27 @@ static bool _valid_pn_min_mem(job_desc_msg_t * job_desc_msg,
 			      part_record_t *part_ptr);
 static int  _write_data_array_to_file(char *file_name, char **data,
 				      uint32_t size);
+
+static bool _check_alluxio_path_exists(const char *data_path) {
+	char command[1024];
+
+	snprintf(command, sizeof(command),"alluxio fs test -e '%s' ; echo $?", data_path);
+
+	FILE *fp = popen(command, "r");
+	if (fp == NULL) {
+		return true;
+	}
+
+	char buffer[10];
+	if (fgets(buffer, sizeof(buffer), fp) == NULL) {
+		pclose(fp);
+		return false;
+	}
+
+	pclose(fp);
+
+	return !atoi(buffer) ? true : false;
+}
 
 static char *_get_mail_user(const char *user_name, uid_t user_id)
 {
@@ -7611,6 +7633,15 @@ static int _job_create(job_desc_msg_t *job_desc, int allocate, int will_run,
 	assoc_mgr_unlock(&assoc_mgr_read_lock);
 	if (error_code != SLURM_SUCCESS)
 		goto cleanup_fail;
+
+	if (job_desc->alluxio_datasource && !xstrcasecmp(slurm_conf.select_type, "select/cons_tres_locality")) {
+		if (!_check_alluxio_path_exists(job_desc->alluxio_datasource)) {
+			info("%s: Job's requested alluxio-datasource is invalid: alluxio_datasource '%s' does not exist in Alluxio",
+				  __func__, job_desc->alluxio_datasource);
+			error_code = ESLURM_INVALID_JOB_ALLUXIO_DATASOURCE;
+			goto cleanup_fail;
+		}
+	}
 
 	if ((error_code = _validate_job_desc(job_desc, allocate, cron,
 					     submit_uid, part_ptr,
