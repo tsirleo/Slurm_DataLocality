@@ -82,8 +82,8 @@ typedef struct {
 					    bool test_only, bool will_run,
 					    bitstr_t **part_core_map);
 	int (*choose_nodes)(job_record_t *job_ptr, bitstr_t *node_map,
-			    bitstr_t **avail_core, uint32_t min_nodes,
-			    uint32_t max_nodes, uint32_t req_nodes,
+			    bitstr_t **avail_core, bitstr_t *data_node_bitmap,
+			    uint32_t min_nodes, uint32_t max_nodes, uint32_t req_nodes,
 			    avail_res_t **avail_res_array, uint16_t cr_type,
 			    bool prefer_alloc_nodes,
 			    gres_mc_data_t *tres_mc_ptr);
