@@ -183,7 +183,7 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 select_cons_tres_locality_la_DEPENDENCIES =  \
 	../cons_common/libcons_common.la
 am_select_cons_tres_locality_la_OBJECTS = dist_tasks.lo gres_sched.lo \
-	job_test.lo select_cons_tres_locality.lo
+	job_test.lo alluxio.lo select_cons_tres_locality.lo
 select_cons_tres_locality_la_OBJECTS =  \
 	$(am_select_cons_tres_locality_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -209,8 +209,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/slurm
 depcomp = $(SHELL) $(top_srcdir)/auxdir/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/dist_tasks.Plo \
-	./$(DEPDIR)/gres_sched.Plo ./$(DEPDIR)/job_test.Plo \
+am__depfiles_remade = ./$(DEPDIR)/alluxio.Plo \
+	./$(DEPDIR)/dist_tasks.Plo ./$(DEPDIR)/gres_sched.Plo \
+	./$(DEPDIR)/job_test.Plo \
 	./$(DEPDIR)/select_cons_tres_locality.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -528,6 +529,7 @@ pkglib_LTLIBRARIES = select_cons_tres_locality.la
 select_cons_tres_locality_la_SOURCES = dist_tasks.c dist_tasks.h	\
 				gres_sched.c gres_sched.h	\
 				job_test.c job_test.h		\
+				alluxio.c alluxio.h         \
 				select_cons_tres_locality.c select_cons_tres_locality.h
 
 select_cons_tres_locality_la_LDFLAGS = $(PLUGIN_FLAGS)
@@ -610,6 +612,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alluxio.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dist_tasks.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gres_sched.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/job_test.Plo@am__quote@ # am--include-marker
@@ -742,7 +745,8 @@ clean-am: clean-generic clean-libtool clean-pkglibLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/dist_tasks.Plo
+		-rm -f ./$(DEPDIR)/alluxio.Plo
+	-rm -f ./$(DEPDIR)/dist_tasks.Plo
 	-rm -f ./$(DEPDIR)/gres_sched.Plo
 	-rm -f ./$(DEPDIR)/job_test.Plo
 	-rm -f ./$(DEPDIR)/select_cons_tres_locality.Plo
@@ -791,7 +795,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/dist_tasks.Plo
+		-rm -f ./$(DEPDIR)/alluxio.Plo
+	-rm -f ./$(DEPDIR)/dist_tasks.Plo
 	-rm -f ./$(DEPDIR)/gres_sched.Plo
 	-rm -f ./$(DEPDIR)/job_test.Plo
 	-rm -f ./$(DEPDIR)/select_cons_tres_locality.Plo
