@@ -40,6 +40,7 @@
 #include "job_test.h"
 #include "../cons_common/gres_select_filter.h"
 #include "gres_sched.h"
+#include "alluxio.h"
 
 typedef struct node_weight_struct {
 	bitstr_t *node_bitmap;	/* bitmap of nodes with this weight */
@@ -61,7 +62,7 @@ static void _cpus_to_use(uint16_t *avail_cpus, int64_t rem_max_cpus,
 static bool _enough_nodes(int avail_nodes, int rem_nodes,
 			  uint32_t min_nodes, uint32_t req_nodes);
 static int _eval_nodes(job_record_t *job_ptr, gres_mc_data_t *mc_ptr,
-		       bitstr_t *node_map, bitstr_t **avail_core,
+		       bitstr_t *node_map, bitstr_t **avail_core, bitstr_t *data_node_bitmap,
 		       uint32_t min_nodes, uint32_t max_nodes,
 		       uint32_t req_nodes, avail_res_t **avail_res_array,
 		       uint16_t cr_type, bool prefer_alloc_nodes,
@@ -405,7 +406,7 @@ static void _select_cores(job_record_t *job_ptr, gres_mc_data_t *mc_ptr,
  * RET SLURM_SUCCESS or an error code
  */
 static int _eval_nodes(job_record_t *job_ptr, gres_mc_data_t *mc_ptr,
-		       bitstr_t *node_map, bitstr_t **avail_core,
+		       bitstr_t *node_map, bitstr_t **avail_core, bitstr_t *data_node_bitmap,
 		       uint32_t min_nodes, uint32_t max_nodes,
 		       uint32_t req_nodes, avail_res_t **avail_res_array,
 		       uint16_t cr_type, bool prefer_alloc_nodes,
@@ -448,6 +449,12 @@ static int _eval_nodes(job_record_t *job_ptr, gres_mc_data_t *mc_ptr,
 	    (!bit_super_set(details_ptr->req_node_bitmap, node_map)))
 		return error_code;
 
+	if (data_node_bitmap) {
+		debug2("Node bitmap content: %s", bit_fmt_binmask(node_map));
+		bit_and(data_node_bitmap, node_map);
+		debug2("Data bitmap intersection content: %s", bit_fmt_binmask(data_node_bitmap));
+	}
+	
 	if (job_ptr->bit_flags & SPREAD_JOB) {
 		/* Spread the job out over many nodes */
 		return _eval_nodes_spread(job_ptr, mc_ptr, node_map, avail_core,
@@ -999,6 +1006,8 @@ fini:	xfree(avail_cpu_per_node);
 			FREE_NULL_LIST(consec_gres[i]);
 		xfree(consec_gres);
 	}
+
+	debug2("Node bitmap content after modification: %s", bit_fmt_binmask(node_map));
 
 	return error_code;
 }
@@ -3153,8 +3162,8 @@ fini:	FREE_NULL_LIST(node_weight_list);
  * RET SLURM_SUCCESS or an error code
  */
 extern int choose_nodes(job_record_t *job_ptr, bitstr_t *node_map,
-			bitstr_t **avail_core, uint32_t min_nodes,
-			uint32_t max_nodes, uint32_t req_nodes,
+			bitstr_t **avail_core, bitstr_t *data_node_bitmap,
+			uint32_t min_nodes, uint32_t max_nodes, uint32_t req_nodes,
 			avail_res_t **avail_res_array, uint16_t cr_type,
 			bool prefer_alloc_nodes, gres_mc_data_t *tres_mc_ptr)
 {
@@ -3198,8 +3207,8 @@ extern int choose_nodes(job_record_t *job_ptr, bitstr_t *node_map,
 	orig_node_map = bit_copy(node_map);
 	orig_core_array = copy_core_array(avail_core);
 
-	ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core, min_nodes,
-			 max_nodes, req_nodes, avail_res_array, cr_type,
+	ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core, data_node_bitmap,
+			 min_nodes, max_nodes, req_nodes, avail_res_array, cr_type,
 			 prefer_alloc_nodes, true);
 	if (ec == SLURM_SUCCESS)
 		goto fini;
@@ -3209,7 +3218,7 @@ extern int choose_nodes(job_record_t *job_ptr, bitstr_t *node_map,
 	rem_nodes = bit_set_count(node_map);
 	if (rem_nodes <= min_nodes) {
 		/* Can not remove any nodes, enable use of non-local GRES */
-		ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core,
+		ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core, data_node_bitmap,
 				 min_nodes, max_nodes, req_nodes,
 				 avail_res_array, cr_type, prefer_alloc_nodes,
 				 false);
@@ -3246,7 +3255,7 @@ extern int choose_nodes(job_record_t *job_ptr, bitstr_t *node_map,
 		}
 		if (nochange && (count != 1))
 			continue;
-		ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core,
+		ec = _eval_nodes(job_ptr, tres_mc_ptr, node_map, avail_core, data_node_bitmap,
 				 min_nodes, max_nodes, req_nodes,
 				 avail_res_array, cr_type, prefer_alloc_nodes,
 				 false);

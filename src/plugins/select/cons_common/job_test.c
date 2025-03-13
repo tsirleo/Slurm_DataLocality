@@ -47,6 +47,8 @@
 #include "src/slurmctld/gres_ctld.h"
 #include "src/slurmctld/licenses.h"
 
+#include "../cons_tres_locality/alluxio.h"
+
 typedef struct {
 	int action;
 	list_t *license_list;
@@ -460,6 +462,7 @@ static bool _is_preemptable(job_record_t *job_ptr, List preemptee_candidates)
  * IN: req_nodes    - number of requested nodes
  * IN/OUT: node_bitmap - bitmap of available nodes / bitmap of selected nodes
  * IN/OUT: avail_core - available/selected cores
+ * IN: data_node_bitmap - bitmap of nodes with alluxio data requested by job
  * IN: cr_type      - resource type
  * IN: test_only    - Determine if job could ever run, ignore allocated memory
  *		      check
@@ -473,7 +476,7 @@ static bool _is_preemptable(job_record_t *job_ptr, List preemptee_candidates)
  */
 static avail_res_t **_select_nodes(job_record_t *job_ptr, uint32_t min_nodes,
 				   uint32_t max_nodes, uint32_t req_nodes,
-				   bitstr_t *node_bitmap, bitstr_t **avail_core,
+				   bitstr_t *node_bitmap, bitstr_t **avail_core, bitstr_t *data_node_bitmap,
 				   node_use_record_t *node_usage,
 				   uint16_t cr_type, bool test_only,
 				   bool will_run,
@@ -527,8 +530,8 @@ static avail_res_t **_select_nodes(job_record_t *job_ptr, uint32_t min_nodes,
 		min_nodes = MAX(min_nodes, i);
 	}
 	rc = (*cons_common_callbacks.choose_nodes)(
-		job_ptr, node_bitmap, avail_core, min_nodes,
-		max_nodes, req_nodes, avail_res_array, cr_type,
+		job_ptr, node_bitmap, avail_core, data_node_bitmap,
+		min_nodes, max_nodes, req_nodes, avail_res_array, cr_type,
 		prefer_alloc_nodes, tres_mc_ptr);
 	if (rc != SLURM_SUCCESS)
 		goto fini;
@@ -929,6 +932,46 @@ static int _job_test(job_record_t *job_ptr, bitstr_t *node_bitmap,
 	if (is_cons_tres)
 		tres_mc_ptr = _build_gres_mc_data(job_ptr);
 
+	bitstr_t *data_node_bitmap = NULL;
+	if (is_cons_tres_locality && !test_only && job_ptr->alluxio_datasource) {
+		char *data_node_list = NULL;
+		NodeCount *node_map_array = NULL;
+		int map_size = 0;
+
+		int rc = process_alluxio_location(job_ptr->alluxio_datasource,
+										  &data_node_list, &node_map_array, &map_size);
+		if (rc == SLURM_SUCCESS) {
+			if (data_node_list) {
+				debug2("Alluxio data list content: %s", data_node_list);
+
+				rc = node_name2bitmap(data_node_list, false, &data_node_bitmap);
+
+				if (rc != SLURM_SUCCESS) {
+					FREE_NULL_BITMAP(data_node_bitmap);
+
+					xfree(data_node_list);
+
+					for (int i = 0; i < map_size; i++) {
+						xfree(node_map_array[i].name);
+					}
+					xfree(node_map_array);
+
+					return rc;
+				}
+
+				debug2("Data bitmap content: %s", bit_fmt_binmask(data_node_bitmap));
+			}
+		} else {
+			debug2("Alluxio data proceeding failed");
+		}
+
+		xfree(data_node_list);
+		for (int j = 0; j < map_size; j++) {
+			xfree(node_map_array[j].name);
+		}
+		xfree(node_map_array);
+	}
+
 try_next_nodes_cnt:
 	if (details_ptr->job_size_bitmap) {
 		int next = bit_fls_from_bit(details_ptr->job_size_bitmap,
@@ -939,7 +982,7 @@ try_next_nodes_cnt:
 			next_job_size = 0;
 	}
 	avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
-					req_nodes, node_bitmap, free_cores,
+					req_nodes, node_bitmap, free_cores, data_node_bitmap,
 					node_usage, cr_type, test_only,
 					will_run, part_core_map,
 					prefer_alloc_nodes, tres_mc_ptr);
@@ -956,6 +999,7 @@ try_next_nodes_cnt:
 		/* job can not fit */
 		xfree(tres_mc_ptr);
 		FREE_NULL_BITMAP(orig_node_map);
+		FREE_NULL_BITMAP(data_node_bitmap);
 		free_core_array(&avail_cores);
 		free_core_array(&free_cores);
 		log_flag(SELECT_TYPE, "test 0 fail: insufficient resources");
@@ -963,6 +1007,7 @@ try_next_nodes_cnt:
 	} else if (test_only) {
 		xfree(tres_mc_ptr);
 		FREE_NULL_BITMAP(orig_node_map);
+		FREE_NULL_BITMAP(data_node_bitmap);
 		free_core_array(&avail_cores);
 		free_core_array(&free_cores);
 		_free_avail_res_array(avail_res_array);
@@ -971,6 +1016,7 @@ try_next_nodes_cnt:
 	} else if (!job_ptr->best_switch) {
 		xfree(tres_mc_ptr);
 		FREE_NULL_BITMAP(orig_node_map);
+		FREE_NULL_BITMAP(data_node_bitmap);
 		free_core_array(&avail_cores);
 		free_core_array(&free_cores);
 		_free_avail_res_array(avail_res_array);
@@ -1075,7 +1121,7 @@ try_next_nodes_cnt:
 		_block_whole_nodes(node_bitmap, avail_cores, free_cores);
 
 	avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
-					req_nodes, node_bitmap, free_cores,
+					req_nodes, node_bitmap, free_cores, data_node_bitmap,
 					node_usage, cr_type, test_only,
 					will_run, part_core_map,
 					prefer_alloc_nodes, tres_mc_ptr);
@@ -1153,7 +1199,7 @@ try_next_nodes_cnt:
 	bit_copybits(orig_node_map, node_bitmap);
 
 	avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
-					req_nodes, node_bitmap, free_cores,
+					req_nodes, node_bitmap, free_cores, data_node_bitmap,
 					node_usage, cr_type, test_only,
 					will_run, part_core_map,
 					prefer_alloc_nodes, tres_mc_ptr);
@@ -1197,7 +1243,7 @@ try_next_nodes_cnt:
 	free_cores_tmp  = copy_core_array(free_cores);
 	node_bitmap_tmp = bit_copy(node_bitmap);
 	avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
-					req_nodes, node_bitmap, free_cores,
+					req_nodes, node_bitmap, free_cores, data_node_bitmap,
 					node_usage, cr_type, test_only,
 					will_run, part_core_map,
 					prefer_alloc_nodes, tres_mc_ptr);
@@ -1228,8 +1274,8 @@ try_next_nodes_cnt:
 			node_bitmap_tmp2 = bit_copy(node_bitmap_tmp);
 			avail_res_array_tmp = _select_nodes(
 				job_ptr, min_nodes, max_nodes, req_nodes,
-				node_bitmap_tmp, free_cores_tmp, node_usage,
-				cr_type, test_only, will_run, part_core_map,
+				node_bitmap_tmp, free_cores_tmp, data_node_bitmap,
+				node_usage,cr_type, test_only, will_run, part_core_map,
 				prefer_alloc_nodes, tres_mc_ptr);
 			if (!avail_res_array_tmp) {
 				free_core_array(&free_cores_tmp2);
@@ -1275,7 +1321,8 @@ try_next_nodes_cnt:
 		bit_copybits(node_bitmap, orig_node_map);
 		avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
 						req_nodes, node_bitmap,
-						free_cores, node_usage, cr_type,
+						free_cores, data_node_bitmap,
+						node_usage, cr_type,
 						test_only, will_run,
 						part_core_map,
 						prefer_alloc_nodes,
@@ -1304,7 +1351,8 @@ try_next_nodes_cnt:
 			_block_whole_nodes(node_bitmap, avail_cores,free_cores);
 		avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
 						req_nodes, node_bitmap,
-						free_cores, node_usage, cr_type,
+						free_cores,  data_node_bitmap,
+						node_usage, cr_type,
 						test_only, will_run,
 						part_core_map,
 						prefer_alloc_nodes,
@@ -1327,7 +1375,8 @@ try_next_nodes_cnt:
 		         i);
 		avail_res_array = _select_nodes(job_ptr, min_nodes, max_nodes,
 						req_nodes, node_bitmap,
-						free_cores, node_usage, cr_type,
+						free_cores,  data_node_bitmap,
+						node_usage, cr_type,
 						test_only, will_run,
 						part_core_map,
 						prefer_alloc_nodes,
@@ -1380,6 +1429,7 @@ alloc_job:
 	if (avail_cores_tmp)
 		free_core_array(&avail_cores_tmp);
 
+	FREE_NULL_BITMAP(data_node_bitmap);
 	FREE_NULL_BITMAP(orig_node_map);
 	free_core_array(&part_core_map);
 	free_core_array(&free_cores_tmp);
